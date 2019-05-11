@@ -1,105 +1,42 @@
-QPdfViewer (@quasar/qpdfviewer)
+QD3 (@quasar/qp3)
 ===
 
 ![official icon](https://img.shields.io/badge/Quasar%201.0-Official%20UI%20App%20Extension-blue.svg)
-![npm (scoped)](https://img.shields.io/npm/v/@quasar/quasar-app-extension-qpdfviewer.svg?style=plastic)
-[![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/quasarframework/app-extension-qpdfviewer.svg)]()
-[![GitHub repo size in bytes](https://img.shields.io/github/repo-size/quasarframework/app-extension-qpdfviewer.svg)]()
-[![npm](https://img.shields.io/npm/dt/@quasar/quasar-app-extension-qpdfviewer.svg)](https://www.npmjs.com/package/@quasar/quasar-app-extension-qpdfviewer)
+![npm (scoped)](https://img.shields.io/npm/v/@quasar/quasar-app-extension-qd3.svg?style=plastic)
+[![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/quasarframework/app-extension-qd3.svg)]()
+[![GitHub repo size in bytes](https://img.shields.io/github/repo-size/quasarframework/app-extension-qd3.svg)]()
+[![npm](https://img.shields.io/npm/dt/@quasar/quasar-app-extension-qd3.svg)](https://www.npmjs.com/package/@quasar/quasar-app-extension-qd3)
 
-QPdfViewer is an `UI App Extension` for [Quasar Framework v1](https://v1.quasar-framework.org/). It will not work with legacy versions of Quasar Framework.
+QD3 is an `UI App Extension` for [Quasar Framework v1](https://v1.quasar-framework.org/). It will not work with legacy versions of Quasar Framework.
 
-This work is currently in `beta` and there are expected changes while things get worked out. Your help with testing is greatly appreciated.
+This work is currently in `alpha` and there are expected changes while things get worked out. Your help with testing is greatly appreciated.
 
 # Info
-QPdfViewer allows you to have PDF in your web pages.
+QD3 allows you to work with the D3 library in your application.
 
 # Install
 To add this App Extension to your Quasar application, run the following (in your Quasar app folder):
 ```
-quasar ext add @quasar/qpdfviewer
+quasar ext add @quasar/qd3
 ```
 
 # Uninstall
 To remove this App Extension from your Quasar application, run the following (in your Quasar app folder):
 ```
-quasar ext remove @quasar/qpdfviewer
+quasar ext remove @quasar/qd3
 ```
 
 # Describe
-You can use `quasar describe QPdfViewer`
+You can use `quasar describe QD3`
 
 # Test Project
-In **demo** folder of **app-extension-qpdfviewer**.
+In **demo** folder of **app-extension-qd3**.
 
 # Demo
-Can be found [here](https://quasarframework.github.io/app-extension-qpdfviewer/demo/dist/spa/#/).
+Can be found [here](https://quasarframework.github.io/app-extension-qd3/demo/dist/spa/#/).
 
 # Example Code
 Be sure to check out the Test Project for more examples.
 ```
-<q-pdfviewer
-  v-model="show"
-  src="'https://www.ets.org/Media/Tests/GRE/pdf/gre_research_validity_data.pdf'"
-  content-class="absolute"
-/>
-
-or
-
-<template>
-  <div class="container q-pa-lg">
-    <q-pdfviewer
-      v-model="show"
-      :src="src"
-      content-class="fit container"
-      inner-content-class="fit container"
-    />
-  </div>
-</template>
-
-<script>
-export default {
-  name: 'Container',
-  props: {
-    src: String
-  },
-
-  data () {
-    return {
-      show: true
-    }
-  }
-}
-</script>
-
-<style>
-.container {
-  max-width: 50%;
-  max-height: 70%;
-  min-width: 400px;
-  min-height: 600px;
-  width: 100%;
-  height: 100%;
-}
-</style>
-
+// todo: add an example
 ```
-
----
-NOTE:
-  QPdfviewer uses the `<object>` tag for displaying the PDF. Should the browser not support this, the fallback is to use an `<iframe>`. And, should this also not be supported by the browser, then some text will be displayed with a link to the PDF so the user can download it for off-line viewing.
-
----
-
-# QPdfviewer Vue Properties
-| Vue&nbsp;Property | Type	| Description |
-|---|---|---|
-| value | Boolean | Use v-model to toggle visiblity |
-| src | String | Path to the PDF source |
-| error-string | String | Set this if you wish to change from the default error string |
-| content-class | [String, Object, Array] | Style definitions to be attributed to the PDF container |
-| content-style | [String, Object, Array] | Style definitions to be attributed to the PDF container |
-| inner-content-class | [String, Object, Array] | Style definitions to be attributed to the PDF object |
-| inner-content-style | [String, Object, Array] | Style definitions to be attributed to the PDF object |
-
-QPdfViewer has no events or slots.
