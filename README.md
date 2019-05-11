@@ -1,4 +1,4 @@
-QD3 (@quasar/qp3)
+QD3 (@quasar/qd3)
 ===
 
 ![official icon](https://img.shields.io/badge/Quasar%201.0-Official%20UI%20App%20Extension-blue.svg)
