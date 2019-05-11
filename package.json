@@ -1,8 +1,8 @@
 {
-  "name": "@quasar/quasar-app-extension-qpdfviewer",
-  "version": "1.0.0-beta.2",
-  "description": "QPdfviewer is an app extension for viewing PDF files",
-  "author": "Hawkeye64 <jeff@quasar-framework.org>",
+  "name": "@quasar/quasar-app-extension-qd3",
+  "version": "1.0.0-alpha.1",
+  "description": "qd3 is a Quasar 1.0 app extension for using D3",
+  "author": "Daniel Thompson-Yvetot <35242872+nothingismagick@users.noreply.github.com>",
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint --ext .js,.vue src",
@@ -17,12 +17,12 @@
   "publishConfig": {
     "access": "public"
   },
-  "bugs": "https://github.com/quasarframework/app-extension-qpdfviewer/issues",
+  "bugs": "https://github.com/quasarframework/app-extension-qd3/issues",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/quasarframework/app-extension-qpdfviewer.git"
+    "url": "git+https://github.com/quasarframework/app-extension-qd3.git"
   },
-  "homepage": "https://github.com/quasarframework/app-extension-qpdfviewer",
+  "homepage": "https://github.com/quasarframework/app-extension-qd3",
   "license": "MIT",
   "keywords": [
     "quasar",
@@ -38,5 +38,11 @@
     "eslint": "^5.15.3",
     "eslint-loader": "^2.1.2",
     "eslint-plugin-vue": "^5.2.2"
+  },
+  "dependencies": {
+    "d3": "^5.9.2"
+  },
+  "resolutions": {
+    "d3-selection": "1.3.0"
   }
 }

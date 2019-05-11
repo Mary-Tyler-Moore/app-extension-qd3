@@ -7,15 +7,15 @@
 
 const extendConf = function (conf) {
   // make sure qpdfviewer boot file is registered
-  conf.boot.push('~@quasar/quasar-app-extension-qpdfviewer/src/boot/qpdfviewer.js')
-  console.log(` App Extension (qpdfviewer) Info: 'Adding qpdfviewer boot reference to your quasar.conf.js'`)
+  conf.boot.push('~@quasar/quasar-app-extension-qd3/src/boot/qd3.js')
+  console.log(` App Extension (qd3) Info: 'Adding qd3 boot reference to your quasar.conf.js'`)
 
   // make sure boot & component files transpile
-  conf.build.transpileDependencies.push(/quasar-app-extension-qpdfviewer[\\/]src/)
+  conf.build.transpileDependencies.push(/quasar-app-extension-qd3[\\/]src/)
 
   // make sure qpdfviewer css goes through webpack to avoid ssr issues
-  conf.css.push('~@quasar/quasar-app-extension-qpdfviewer/src/component/pdfviewer.styl')
-  console.log(` App Extension (qpdfviewer) Info: 'Adding pdfviewer.styl css reference to your quasar.conf.js'`)
+  conf.css.push('~@quasar/quasar-app-extension-qd3/src/component/d3.styl')
+  console.log(` App Extension (qd3) Info: 'Adding d3.styl css reference to your quasar.conf.js'`)
 }
 
 module.exports = function (api) {
@@ -23,7 +23,7 @@ module.exports = function (api) {
   api.compatibleWith('@quasar/app', '^1.0.0-beta.18')
 
   // register JSON api
-  api.registerDescribeApi('QPdfviewer', './component/QPdfviewer.json')
+  api.registerDescribeApi('QD3', './component/QD3.json')
 
   // extend quasar.conf
   api.extendQuasarConf(extendConf)

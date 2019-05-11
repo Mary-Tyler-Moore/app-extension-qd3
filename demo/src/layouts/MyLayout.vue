@@ -11,11 +11,7 @@
       </q-toolbar>
 
       <q-tabs align="left">
-        <q-route-tab to="/" label="PDF 1" />
-        <q-route-tab to="/page2" label="PDF 2" />
-        <q-route-tab to="/page3" label="PDF 3" />
-        <q-route-tab to="/page4" label="PDF 4" />
-        <q-route-tab to="/page5" label="Containers" />
+        <q-route-tab to="/page" label="demo test" />
       </q-tabs>
 
     </q-header>

@@ -1,11 +1,6 @@
 <template>
   <div class="container q-pa-lg">
-    <q-pdfviewer
-      v-model="show"
-      :src="src"
-      content-class="fit container"
-      inner-content-class="fit container"
-    />
+
   </div>
 </template>
 

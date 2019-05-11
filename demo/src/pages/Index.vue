@@ -1,10 +1,5 @@
 <template>
   <q-page class="flex flex-center">
-    <q-pdfviewer
-      v-model="show"
-      :src="src"
-      content-class="absolute"
-    />
   </q-page>
 </template>
 
