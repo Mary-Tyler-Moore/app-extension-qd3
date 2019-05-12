@@ -23,7 +23,40 @@ Src
 
 <script>
 import { colors } from 'quasar'
-const { lighten } = colors
+const { lighten, textToRgb, rgbToHsv, hsvToRgb } = colors // lighten,
+
+/**
+ * Saturate or desaturate a hex color
+ *
+ * @param color
+ * @param percent
+ * @returns {string} - e.g. #ffffff
+ */
+const saturate = function (color, percent) {
+  if (typeof color !== 'string') {
+    throw new TypeError('Expected a string as color')
+  }
+  if (typeof percent !== 'number') {
+    throw new TypeError('Expected a numeric percent')
+  }
+
+  let rgb = textToRgb(color)
+  // t = percent < 0 ? 0 : 255,
+  // p = Math.abs(percent) / 100,
+
+  const hsv = rgbToHsv(rgb)
+  hsv[1] *= percent
+  rgb = hsvToRgb(hsv)
+
+  const R = rgb.r,
+    G = rgb.g,
+    B = rgb.b,
+    text = '#' + (
+      0x1000000 + R * 0x10000 + G * 0x100 + B
+    ).toString(16).slice(1)
+  console.log(color, text)
+  return text
+}
 
 export default {
   data () {
@@ -162,9 +195,12 @@ export default {
         .style('fill', d => {
           let index = d.source.index
           let percentage = (colorProcessingPercentages[index] ? colorProcessingPercentages[index] : 70) - 30
+          // // let percentage = (colorProcessingPercentages[index] ? colorProcessingPercentages[index] : 0.70) * index
+          console.log(index, percentage)
           colorProcessingPercentages[index] = percentage
           let color = fill(index)
-          return lighten(color, percentage)
+          // return
+          return lighten(saturate(color, percentage), percentage)
         })
         .attr('d', this.$d3.ribbon().radius(innerRadius))
     }
