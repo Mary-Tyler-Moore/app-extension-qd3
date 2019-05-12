@@ -13,7 +13,8 @@ const apis = fs.readdirSync(apiPath)
 apis
   .forEach(apiName => {
     quasarApi[apiName] = {
-      related: []
+      related: [],
+      group: ''
     }
 
     fs.readFile(path.join(apiPath, apiName + '.json'), 'UTF-8', (err, data) => {
@@ -49,6 +50,12 @@ fs.readdirSync(componentsPath).forEach(componentDir => {
           let matches = null
           if ((matches = /import (\S+) from/g.exec(line)) != null && apis.includes(matches[1])) {
             componentData.related.push(matches[1])
+          }
+        })
+
+        rl.on('close', () => {
+          if (group !== component && !componentData.related.includes(group) && quasarApi[group]) {
+            componentData.related.push(group)
           }
         })
       }
