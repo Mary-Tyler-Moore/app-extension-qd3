@@ -8,7 +8,7 @@ Src
 -->
 
 <template>
-  <div>
+  <div class="row">
     <div class="q-pa-md">
       <q-input
         v-model="filter"
@@ -17,6 +17,7 @@ Src
         debounce="500"
       />
     </div>
+    <span style="width: 100px">{{ focusedComponentIndex !== null ? filteredComponents[focusedComponentIndex].name : '' }}</span>
     <svg width="500" height="300"></svg>
   </div>
 </template>
@@ -62,7 +63,8 @@ export default {
   data () {
     return {
       filter: '',
-      components: []
+      components: [],
+      focusedComponentIndex: null
     }
   },
 
@@ -167,7 +169,10 @@ export default {
         .enter().append('g')
         .attr('class', 'group')
 
+      const defaultOpacity = 0.8
+
       g.append('path')
+        .style('opacity', defaultOpacity)
         .style('fill', d => fill(d.index))
         .style('stroke', d => fill(d.index))
         .attr('d', arc)
@@ -191,6 +196,7 @@ export default {
         .data(chord)
         .enter().append('path')
         .attr('class', 'chord')
+        .style('opacity', defaultOpacity)
         .style('stroke', d => this.$d3.rgb(fill(d.source.index)).darker())
         .style('fill', d => {
           let index = d.source.index
@@ -203,6 +209,34 @@ export default {
           return lighten(saturate(color, percentage), percentage)
         })
         .attr('d', this.$d3.ribbon().radius(innerRadius))
+
+      const chords = this.$el.querySelectorAll('.chord'),
+        svgEl = this.$el.querySelector('svg')
+
+      svgEl.addEventListener('mousemove', e => {
+        const d = e.target.__data__
+        if (d) {
+          const isChord = d.source && d.target
+          if (isChord) {
+            this.focusedComponentIndex = d.source.index
+            for (const chord of chords) {
+              chord.style.opacity = chord.__data__.source.index === d.source.index ? defaultOpacity : 0.1
+            }
+          } else {
+            this.focusedComponentIndex = d.index
+            for (const chord of this.$el.querySelectorAll('svg .chord')) {
+              chord.style.opacity = chord.__data__.source.index === d.index || chord.__data__.target.index === d.index ? defaultOpacity : 0.1
+            }
+          }
+        }
+      })
+
+      svgEl.addEventListener('mouseleave', e => {
+        this.focusedComponentIndex = null
+        for (const chord of chords) {
+          chord.style.opacity = 0.8
+        }
+      })
     }
   }
 }
