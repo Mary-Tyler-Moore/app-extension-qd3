@@ -100,24 +100,7 @@ export default {
   },
 
   created (createElement) {
-    const components = require('../statics/quasar-api.json')
-    this.components = Object.entries(components).map(entry => {
-      return {
-        name: entry[0],
-        ...entry[1]
-      }
-    }).filter(comp => {
-      if (comp.related.length) {
-        return true
-      }
-      for (let otherCompName in components) {
-        const otherComp = components[otherCompName]
-        if (otherComp.name !== comp.name && otherComp.related.includes(comp.name)) {
-          return true
-        }
-      }
-      return false
-    })
+    this.components = require('../statics/quasar-api.json')
   },
 
   watch: {
