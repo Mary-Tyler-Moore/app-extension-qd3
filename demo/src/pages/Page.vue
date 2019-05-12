@@ -100,24 +100,23 @@ export default {
   },
 
   created (createElement) {
-    this.$d3.json('quasar-api.json').then((components) => {
-      this.components = Object.entries(components).map(entry => {
-        return {
-          name: entry[0],
-          ...entry[1]
-        }
-      }).filter(comp => {
-        if (comp.related.length) {
+    const components = require('../statics/quasar-api.json')
+    this.components = Object.entries(components).map(entry => {
+      return {
+        name: entry[0],
+        ...entry[1]
+      }
+    }).filter(comp => {
+      if (comp.related.length) {
+        return true
+      }
+      for (let otherCompName in components) {
+        const otherComp = components[otherCompName]
+        if (otherComp.name !== comp.name && otherComp.related.includes(comp.name)) {
           return true
         }
-        for (let otherCompName in components) {
-          const otherComp = components[otherCompName]
-          if (otherComp.name !== comp.name && otherComp.related.includes(comp.name)) {
-            return true
-          }
-        }
-        return false
-      })
+      }
+      return false
     })
   },
 

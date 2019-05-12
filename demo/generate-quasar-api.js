@@ -64,5 +64,5 @@ fs.readdirSync(componentsPath).forEach(componentDir => {
 })
 
 process.on('exit', () => {
-  fs.writeFileSync('quasar-api.json', JSON.stringify(quasarApi, '', 2))
+  fs.writeFileSync('src/statics/quasar-api.json', JSON.stringify(quasarApi, '', 2))
 })
