@@ -9,14 +9,15 @@ Src
 
 <template>
   <div>
+    <div class="q-pa-md">
+      <q-input
+        v-model="filter"
+        square
+        placeholder="Search"
+        debounce="500"
+      />
+    </div>
     <svg width="500" height="300"></svg>
-    <br>
-    <q-slider
-      v-model="circleSize"
-      :min="1"
-      :max="100"
-      :step="1"
-    ></q-slider>
   </div>
 </template>
 
@@ -24,33 +25,83 @@ Src
 export default {
   data () {
     return {
-      circleSize: 50
+      filter: '',
+      components: []
     }
   },
 
-  mounted (createElement) {
-    var outerRadius = 700 / 2,
-      innerRadius = outerRadius - 150
+  methods: {
+    // Returns the Flare package name for the given class name.
+    name: name => name
+  },
 
-    var fill = this.$d3.scaleOrdinal(this.$d3.schemeCategory10)
+  computed: {
+    filteredComponents () {
+      if (this.filter) {
+        let filter = this.filter.toLowerCase(),
+          include = []
 
-    var chord = this.$d3.chord()
-      .padAngle(0.04)
-      .sortSubgroups(this.$d3.descending)
-      .sortChords(this.$d3.descending)
+        this.components.forEach(c => {
+          if (c.name.toLowerCase().includes(filter) || c.group.toLowerCase().includes(filter)) {
+            include = include.concat(c.related)
+            include.push(c.name)
+          }
+        })
 
-    var arc = this.$d3.arc()
-      .innerRadius(innerRadius)
-      .outerRadius(innerRadius + 20)
+        return this.components.filter(c => include.includes(c.name))
+      }
+      return this.components
+    },
 
-    var svg = this.$d3.select(this.$el).select('svg')
-      .attr('width', outerRadius * 2)
-      .attr('height', outerRadius * 2)
-      .append('g')
-      .attr('transform', 'translate(' + outerRadius + ',' + outerRadius + ')')
+    indexByName () {
+      let indexByName = this.$d3.map(),
+        n = 0
+      // Compute a unique index for each package name.
+      this.filteredComponents.forEach(d => {
+        if (!indexByName.has(d = this.name(d.name))) {
+          indexByName.set(d, n++)
+        }
+      })
 
+      return indexByName
+    },
+
+    nameByIndex () {
+      let nameByIndex = this.$d3.map(),
+        n = 0
+      // Compute a unique index for each package name.
+      this.filteredComponents.forEach(d => {
+        nameByIndex.set(n++, this.name(d.name))
+      })
+
+      return nameByIndex
+    },
+
+    matrix () {
+      const matrix = [],
+        n = Object.keys(this.indexByName).length
+
+      // Construct a square matrix counting package imports.
+      this.filteredComponents.forEach(d => {
+        var source = this.indexByName.get(this.name(d.name)),
+          row = matrix[source]
+        if (!row) {
+          row = matrix[source] = []
+          for (var i = -1; ++i < n;) row[i] = 0
+        }
+
+        d.related.forEach(d => {
+          row[this.indexByName.get(this.name(d))]++
+        })
+      })
+
+      return matrix
+    }
+  },
+
+  created (createElement) {
     this.$d3.json('quasar-api.json').then((components) => {
-      let imports = this.components = Object.entries(components).map(entry => {
+      this.components = Object.entries(components).map(entry => {
         return {
           name: entry[0],
           ...entry[1]
@@ -61,45 +112,40 @@ export default {
         }
         for (let otherCompName in components) {
           const otherComp = components[otherCompName]
-          if (otherComp.related.includes(comp.name)) {
+          if (otherComp.name !== comp.name && otherComp.related.includes(comp.name)) {
             return true
           }
         }
         return false
       })
+    })
+  },
 
-      var indexByName = this.$d3.map(),
-        nameByIndex = this.$d3.map(),
-        matrix = [],
-        n = 0
+  watch: {
+    matrix (matrix) {
+      let child
+      (child = this.$el.querySelector('svg').children[0]) && child.remove()
 
-      // Returns the Flare package name for the given class name.
-      function name (name) {
-        return name
-      }
+      const outerRadius = 700 / 2,
+        innerRadius = outerRadius - 150,
+        fill = this.$d3.scaleOrdinal(this.$d3.schemeCategory10)
 
-      // Compute a unique index for each package name.
-      imports.forEach(d => {
-        if (!indexByName.has(d = name(d.name))) {
-          nameByIndex.set(n, d)
-          indexByName.set(d, n++)
-        }
-      })
+      const chord = this.$d3.chord()
+        .padAngle(0.04)
+        .sortSubgroups(this.$d3.descending)
+        .sortChords(this.$d3.descending)(matrix)
 
-      // Construct a square matrix counting package imports.
-      imports.forEach(d => {
-        var source = indexByName.get(name(d.name)),
-          row = matrix[source]
-        if (!row) {
-          row = matrix[source] = []
-          for (var i = -1; ++i < n;) row[i] = 0
-        }
-        d.related.forEach(d => row[indexByName.get(name(d))]++)
-      })
+      const arc = this.$d3.arc()
+        .innerRadius(innerRadius)
+        .outerRadius(innerRadius + 20)
 
-      chord = chord(matrix)
+      const svg = this.$d3.select(this.$el).select('svg')
+        .attr('width', outerRadius * 2)
+        .attr('height', outerRadius * 2)
+        .append('g')
+        .attr('transform', 'translate(' + outerRadius + ',' + outerRadius + ')')
 
-      var g = svg.selectAll('.group')
+      const g = svg.selectAll('.group')
         .data(chord.groups)
         .enter().append('g')
         .attr('class', 'group')
@@ -120,7 +166,7 @@ export default {
             (d.angle > Math.PI ? 'rotate(180)' : '')
         })
         .style('text-anchor', d => d.angle > Math.PI ? 'end' : null)
-        .text(d => nameByIndex.get(d.index))
+        .text(d => this.nameByIndex.get(d.index))
 
       svg.selectAll('.chord')
         .data(chord)
@@ -129,13 +175,6 @@ export default {
         .style('stroke', d => this.$d3.rgb(fill(d.source.index)).darker())
         .style('fill', d => fill(d.source.index))
         .attr('d', this.$d3.ribbon().radius(innerRadius))
-    })
-  },
-
-  watch: {
-    circleSize (newValue) {
-      this.circle
-        .attr('r', newValue)
     }
   }
 }

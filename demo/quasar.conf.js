@@ -40,7 +40,8 @@ module.exports = function (ctx) {
         'QTabs',
         'QRouteTab',
         'QAvatar',
-        'QSlider'
+        'QSlider',
+        'QInput'
       ],
 
       directives: [
