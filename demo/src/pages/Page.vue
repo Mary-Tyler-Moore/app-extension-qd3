@@ -96,6 +96,47 @@ export default {
           this.mutateFocusedComponentIndex(amount > 0 ? 1 : -1)
         }
       })
+    },
+
+    __mouseMove (e) {
+      const d = e.target.__data__
+      if (d) {
+        const isChord = d.source && d.target
+        if (isChord) {
+          this.focusedComponentIndex = d.source.index
+        } else {
+          this.focusedComponentIndex = d.index
+        }
+      }
+
+      // TODO focus svg
+    },
+
+    __focus (e) {},
+
+    __blur (e) {
+      this.focusedComponentIndex = null
+    },
+
+    __keydown (e) {
+      let index = this.focusedComponentIndex
+      if (e.keyCode === 37 || e.keyCode === 40) { // left/down
+        this.mutateFocusedComponentIndex(-1)
+      } else if (e.keyCode === 39 || e.keyCode === 38) { // right/top
+        this.mutateFocusedComponentIndex(1)
+      } else if (e.keyCode === 27) {
+        this.mutateFocusedComponentIndex(null)
+      } else {
+        return
+      }
+
+      if (index !== null) {
+        e.preventDefault()
+      }
+    },
+
+    __mouseLeave (e) {
+      this.focusedComponentIndex = null
     }
   },
 
@@ -167,50 +208,23 @@ export default {
     this.components = require('../statics/quasar-api.json')
   },
 
+  destroyed () {
+    const svgEl = this.$el.querySelector('svg')
+    svgEl.removeEventListener('mousemove', this.__mouseMove)
+    svgEl.removeEventListener('focus', this.__focus)
+    svgEl.removeEventListener('blur', this.__blur)
+    svgEl.removeEventListener('keydown', this.__keydown)
+    svgEl.removeEventListener('mouseleave', this.__mouseLeave)
+  },
+
   mounted () {
     const svgEl = this.$el.querySelector('svg')
 
-    svgEl.addEventListener('mousemove', e => {
-      const d = e.target.__data__
-      if (d) {
-        const isChord = d.source && d.target
-        if (isChord) {
-          this.focusedComponentIndex = d.source.index
-        } else {
-          this.focusedComponentIndex = d.index
-        }
-      }
-
-      // TODO focus svg
-    })
-
-    svgEl.addEventListener('focus', e => {
-    })
-
-    svgEl.addEventListener('blur', e => {
-      this.focusedComponentIndex = null
-    })
-
-    svgEl.addEventListener('keydown', e => {
-      let index = this.focusedComponentIndex
-      if (e.keyCode === 37 || e.keyCode === 40) { // left/down
-        this.mutateFocusedComponentIndex(-1)
-      } else if (e.keyCode === 39 || e.keyCode === 38) { // right/top
-        this.mutateFocusedComponentIndex(1)
-      } else if (e.keyCode === 27) {
-        this.mutateFocusedComponentIndex(null)
-      } else {
-        return
-      }
-
-      if (index !== null) {
-        e.preventDefault()
-      }
-    })
-
-    svgEl.addEventListener('mouseleave', e => {
-      this.focusedComponentIndex = null
-    })
+    svgEl.addEventListener('mousemove', this.__mouseMove)
+    svgEl.addEventListener('focus', this.__focus)
+    svgEl.addEventListener('blur', this.__blur)
+    svgEl.addEventListener('keydown', this.__keydown)
+    svgEl.addEventListener('mouseleave', this.__mouseLeave)
   },
 
   watch: {
