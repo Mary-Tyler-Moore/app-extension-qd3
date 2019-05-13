@@ -105,7 +105,10 @@ const saturate = function (color, percent) {
   return text
 }
 
-const defaultOpacity = 0.8
+const defaultChordOpacity = 0.8
+const inactiveChordOpacity = 0.1
+const defaultGroupOpacity = 0.9
+const inactiveGroupOpacity = 0.4
 
 export default {
   data () {
@@ -114,6 +117,7 @@ export default {
       components: [],
       focusedComponentIndex: null,
       chords: [],
+      groups: [],
       componentCount: 0,
       showDialog: false,
       tab: 'description'
@@ -297,16 +301,24 @@ export default {
         for (const chord of this.chords) {
           let active = chord.__data__.source.index === newValue
           if (active) {
-            chord.style.opacity = defaultOpacity
+            chord.style.opacity = defaultChordOpacity
             hasActiveComponent = true
           } else {
-            chord.style.opacity = 0.1
+            chord.style.opacity = inactiveChordOpacity
           }
         }
+
+        for (const group of this.groups) {
+          group.style.opacity = group.__data__.index === newValue ? defaultGroupOpacity : inactiveGroupOpacity
+        }
+
         this.hasActiveComponent = hasActiveComponent
       } else {
         for (const chord of this.chords) {
-          chord.style.opacity = defaultOpacity
+          chord.style.opacity = defaultChordOpacity
+        }
+        for (const group of this.groups) {
+          group.style.opacity = defaultGroupOpacity
         }
       }
     },
@@ -336,10 +348,11 @@ export default {
         .data(chord.groups)
         .enter().append('g')
         .attr('class', 'group')
+        .style('opacity', defaultGroupOpacity)
         // .attr('transform', 'rotate(20)')
 
       g.append('path')
-        .style('opacity', defaultOpacity)
+        .style('opacity', defaultChordOpacity)
         .style('fill', d => fill(d.index))
         .style('stroke', d => fill(d.index))
         .attr('d', arc)
@@ -365,7 +378,7 @@ export default {
         .data(chord)
         .enter().append('path')
         .attr('class', 'chord')
-        .style('opacity', defaultOpacity)
+        .style('opacity', defaultChordOpacity)
         .style('stroke', d => this.$d3.rgb(fill(d.source.index)).darker())
         .style('fill', d => {
           let index = d.source.index
@@ -380,6 +393,7 @@ export default {
         .attr('d', this.$d3.ribbon().radius(innerRadius))
 
       this.chords = this.$el.querySelectorAll('.chord')
+      this.groups = this.$el.querySelectorAll('.group')
       this.componentCount = Object.keys(this.indexByName).length
     }
   }
