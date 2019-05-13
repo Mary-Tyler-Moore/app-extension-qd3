@@ -176,25 +176,28 @@ export default {
     })
 
     svgEl.addEventListener('keydown', e => {
+      let index = this.focusedComponentIndex
       if (e.keyCode === 37 || e.keyCode === 40) { // left/down
-        this.focusedComponentIndex = this.focusedComponentIndex === null ? 0 : this.focusedComponentIndex - 1
+        index = index === null ? 0 : index - 1
       } else if (e.keyCode === 39 || e.keyCode === 38) { // right/top
-        this.focusedComponentIndex = this.focusedComponentIndex === null ? 0 : this.focusedComponentIndex + 1
+        index = index === null ? 0 : index + 1
       } else if (e.keyCode === 27) {
-        this.focusedComponentIndex = null
+        index = null
       } else {
         return
       }
 
-      if (this.focusedComponentIndex !== null) {
-        if (this.focusedComponentIndex === componentCount()) {
-          this.focusedComponentIndex = 0
-        } else if (this.focusedComponentIndex === -1) {
-          this.focusedComponentIndex = componentCount() - 1
+      if (index !== null) {
+        if (index === componentCount()) {
+          index = 0
+        } else if (index === -1) {
+          index = componentCount() - 1
         }
 
         e.preventDefault()
       }
+
+      this.focusedComponentIndex = index
     })
 
     svgEl.addEventListener('mouseleave', e => {
