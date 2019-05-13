@@ -59,12 +59,15 @@ const saturate = function (color, percent) {
   return text
 }
 
+const defaultOpacity = 0.8
+
 export default {
   data () {
     return {
       filter: '',
       components: [],
-      focusedComponentIndex: null
+      focusedComponentIndex: null,
+      chords: []
     }
   },
 
@@ -141,7 +144,77 @@ export default {
     this.components = require('../statics/quasar-api.json')
   },
 
+  mounted () {
+    const svgEl = this.$el.querySelector('svg')
+    let _componentCount = null
+    const componentCount = () => {
+      if (!_componentCount) {
+        _componentCount = Object.keys(this.indexByName).length
+      }
+      return _componentCount
+    }
+
+    svgEl.addEventListener('mousemove', e => {
+      const d = e.target.__data__
+      if (d) {
+        const isChord = d.source && d.target
+        if (isChord) {
+          this.focusedComponentIndex = d.source.index
+        } else {
+          this.focusedComponentIndex = d.index
+        }
+      }
+
+      // TODO focus svg
+    })
+
+    svgEl.addEventListener('focus', e => {
+    })
+
+    svgEl.addEventListener('blur', e => {
+      this.focusedComponentIndex = null
+    })
+
+    svgEl.addEventListener('keydown', e => {
+      if (e.keyCode === 37 || e.keyCode === 40) { // left/down
+        this.focusedComponentIndex = this.focusedComponentIndex === null ? 0 : this.focusedComponentIndex - 1
+      } else if (e.keyCode === 39 || e.keyCode === 38) { // right/top
+        this.focusedComponentIndex = this.focusedComponentIndex === null ? 0 : this.focusedComponentIndex + 1
+      } else if (e.keyCode === 27) {
+        this.focusedComponentIndex = null
+      } else {
+        return
+      }
+
+      if (this.focusedComponentIndex !== null) {
+        if (this.focusedComponentIndex === componentCount()) {
+          this.focusedComponentIndex = 0
+        } else if (this.focusedComponentIndex === -1) {
+          this.focusedComponentIndex = componentCount() - 1
+        }
+
+        e.preventDefault()
+      }
+    })
+
+    svgEl.addEventListener('mouseleave', e => {
+      this.focusedComponentIndex = null
+    })
+  },
+
   watch: {
+    focusedComponentIndex (newValue) {
+      if (newValue !== null) {
+        for (const chord of this.chords) {
+          chord.style.opacity = chord.__data__.source.index === newValue ? defaultOpacity : 0.1
+        }
+      } else {
+        for (const chord of this.chords) {
+          chord.style.opacity = defaultOpacity
+        }
+      }
+    },
+
     matrix (matrix) {
       let child
       (child = this.$el.querySelector('svg').children[0]) && child.remove()
@@ -168,8 +241,6 @@ export default {
         .data(chord.groups)
         .enter().append('g')
         .attr('class', 'group')
-
-      const defaultOpacity = 0.8
 
       g.append('path')
         .style('opacity', defaultOpacity)
@@ -210,33 +281,7 @@ export default {
         })
         .attr('d', this.$d3.ribbon().radius(innerRadius))
 
-      const chords = this.$el.querySelectorAll('.chord'),
-        svgEl = this.$el.querySelector('svg')
-
-      svgEl.addEventListener('mousemove', e => {
-        const d = e.target.__data__
-        if (d) {
-          const isChord = d.source && d.target
-          if (isChord) {
-            this.focusedComponentIndex = d.source.index
-            for (const chord of chords) {
-              chord.style.opacity = chord.__data__.source.index === d.source.index ? defaultOpacity : 0.1
-            }
-          } else {
-            this.focusedComponentIndex = d.index
-            for (const chord of this.$el.querySelectorAll('svg .chord')) {
-              chord.style.opacity = chord.__data__.source.index === d.index || chord.__data__.target.index === d.index ? defaultOpacity : 0.1
-            }
-          }
-        }
-      })
-
-      svgEl.addEventListener('mouseleave', e => {
-        this.focusedComponentIndex = null
-        for (const chord of chords) {
-          chord.style.opacity = 0.8
-        }
-      })
+      this.chords = this.$el.querySelectorAll('.chord')
     }
   }
 }
