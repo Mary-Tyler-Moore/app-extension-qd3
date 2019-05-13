@@ -19,6 +19,31 @@ Src
     </div>
     <span style="width: 100px">{{ focusedComponentIndex !== null ? filteredComponents[focusedComponentIndex].name : '' }}</span>
     <svg width="500" height="300"></svg>
+    <q-dialog v-model="showDialog">
+      <q-card v-if="focusedComponentIndex !== null">
+        <q-toolbar>
+          <q-toolbar-title>
+            {{ filteredComponents[focusedComponentIndex].name }}
+          </q-toolbar-title>
+          <q-btn flat round dense icon="close" v-close-popup />
+        </q-toolbar>
+        <q-tabs v-model="tab">
+          <q-tab name="description" label="Description" />
+          <q-tab name="api" label="API" /> <q-tab name="example" label="Example" />
+        </q-tabs>
+        <q-tab-panels v-model="tab">
+          <q-tab-panel name="description">
+            Test description
+          </q-tab-panel>
+          <q-tab-panel name="api">
+            Test API
+          </q-tab-panel>
+          <q-tab-panel name="example">
+            Test example
+          </q-tab-panel>
+        </q-tab-panels>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -68,7 +93,9 @@ export default {
       components: [],
       focusedComponentIndex: null,
       chords: [],
-      componentCount: 0
+      componentCount: 0,
+      showDialog: false,
+      tab: 'description'
     }
   },
 
@@ -115,6 +142,9 @@ export default {
     __focus (e) {},
 
     __blur (e) {
+      if (this.showDialog) {
+        return
+      }
       this.focusedComponentIndex = null
     },
 
@@ -136,7 +166,17 @@ export default {
     },
 
     __mouseLeave (e) {
+      if (this.showDialog) {
+        return
+      }
       this.focusedComponentIndex = null
+    },
+
+    __click (e) {
+      const d = e.target.__data__
+      if (d) {
+        this.showDialog = true
+      }
     }
   },
 
@@ -215,6 +255,7 @@ export default {
     svgEl.removeEventListener('blur', this.__blur)
     svgEl.removeEventListener('keydown', this.__keydown)
     svgEl.removeEventListener('mouseleave', this.__mouseLeave)
+    svgEl.removeEventListener('click', this.__click)
   },
 
   mounted () {
@@ -225,6 +266,7 @@ export default {
     svgEl.addEventListener('blur', this.__blur)
     svgEl.addEventListener('keydown', this.__keydown)
     svgEl.addEventListener('mouseleave', this.__mouseLeave)
+    svgEl.addEventListener('click', this.__click)
   },
 
   watch: {
