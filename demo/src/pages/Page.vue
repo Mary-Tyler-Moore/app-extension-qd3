@@ -74,7 +74,29 @@ export default {
 
   methods: {
     // Returns the Flare package name for the given class name.
-    name: name => name
+    name: name => name,
+
+    mutateFocusedComponentIndex (amount) {
+      if (amount === null) {
+        this.focusedComponentIndex = null
+      } else if (this.focusedComponentIndex === null) {
+        this.focusedComponentIndex = 0
+      } else {
+        let index = this.focusedComponentIndex + amount
+        if (index >= this.componentCount) {
+          index = 0
+        } else if (index < 0) {
+          index = this.componentCount - 1
+        }
+        this.focusedComponentIndex = index
+      }
+
+      this.$nextTick(() => {
+        if (this.focusedComponentIndex !== null && !this.hasActiveComponent) {
+          this.mutateFocusedComponentIndex(amount > 0 ? 1 : -1)
+        }
+      })
+    }
   },
 
   computed: {
@@ -172,26 +194,18 @@ export default {
     svgEl.addEventListener('keydown', e => {
       let index = this.focusedComponentIndex
       if (e.keyCode === 37 || e.keyCode === 40) { // left/down
-        index = index === null ? 0 : index - 1
+        this.mutateFocusedComponentIndex(-1)
       } else if (e.keyCode === 39 || e.keyCode === 38) { // right/top
-        index = index === null ? 0 : index + 1
+        this.mutateFocusedComponentIndex(1)
       } else if (e.keyCode === 27) {
-        index = null
+        this.mutateFocusedComponentIndex(null)
       } else {
         return
       }
 
       if (index !== null) {
-        if (index === this.componentCount) {
-          index = 0
-        } else if (index === -1) {
-          index = this.componentCount - 1
-        }
-
         e.preventDefault()
       }
-
-      this.focusedComponentIndex = index
     })
 
     svgEl.addEventListener('mouseleave', e => {
@@ -202,9 +216,17 @@ export default {
   watch: {
     focusedComponentIndex (newValue) {
       if (newValue !== null) {
+        let hasActiveComponent = false
         for (const chord of this.chords) {
-          chord.style.opacity = chord.__data__.source.index === newValue ? defaultOpacity : 0.1
+          let active = chord.__data__.source.index === newValue
+          if (active) {
+            chord.style.opacity = defaultOpacity
+            hasActiveComponent = true
+          } else {
+            chord.style.opacity = 0.1
+          }
         }
+        this.hasActiveComponent = hasActiveComponent
       } else {
         for (const chord of this.chords) {
           chord.style.opacity = defaultOpacity
