@@ -6,44 +6,65 @@ Links
 Src
   https://github.com/CorpGlory/d3vue/blob/master/src/d3-components/size-controller.vue
 -->
-
+<style>
+body {
+  background: black;
+  color: #888;
+}
+.circle {
+  width:370px;
+  height:370px;
+  font-size:20px;
+  color:#fff;
+  text-align:center;
+  line-height:0;
+  border-radius:50%;
+  background:#222;
+  opacity: 0.95;
+}
+.q-tab {
+  border-radius: 20px 20px 0 0;
+}
+.q-tab-panels {
+  border-radius: 0 0 10px 10px!important;
+}
+</style>
 <template>
   <div class="row">
     <div class="q-pa-md">
       <q-input
         v-model="filter"
         square
+        outlined
         placeholder="Search"
         debounce="500"
+        class="bg-blue-grey-2"
       />
+      <span style="width: 100px" class="text-amber-3">{{ focusedComponentIndex !== null ? filteredComponents[focusedComponentIndex].name : '' }}</span>
     </div>
-    <span style="width: 100px">{{ focusedComponentIndex !== null ? filteredComponents[focusedComponentIndex].name : '' }}</span>
     <svg width="500" height="300"></svg>
-    <q-dialog v-model="showDialog">
-      <q-card v-if="focusedComponentIndex !== null">
-        <q-toolbar>
-          <q-toolbar-title>
-            {{ filteredComponents[focusedComponentIndex].name }}
-          </q-toolbar-title>
-          <q-btn flat round dense icon="close" v-close-popup />
-        </q-toolbar>
-        <q-tabs v-model="tab">
+    <div class="circle" v-if="showDialog" style="position:absolute;left:368px;top:262px">
+      <q-card v-if="focusedComponentIndex !== null" dark flat style="height:80%;margin:22px 30px;background: transparent">
+        <q-btn flat round dense icon="close" v-close-popup style="position:relative;top:-20px"/>
+         <p>{{ filteredComponents[focusedComponentIndex].name }}</p>
+        <q-tabs v-model="tab" dense style="padding-top:3px">
           <q-tab name="description" label="Description" />
           <q-tab name="api" label="API" /> <q-tab name="example" label="Example" />
         </q-tabs>
-        <q-tab-panels v-model="tab">
-          <q-tab-panel name="description">
+        <q-tab-panels v-model="tab" style="height:160px">
+          <q-tab-panel name="description" class="text-amber-1 bg-black">
             Test description
           </q-tab-panel>
-          <q-tab-panel name="api">
+          <q-tab-panel name="api" class="text-amber-1 bg-black">
             Test API
           </q-tab-panel>
-          <q-tab-panel name="example">
+          <q-tab-panel name="example" class="text-amber-1 bg-black">
             Test example
           </q-tab-panel>
         </q-tab-panels>
+        <q-btn flat label="full documentation" style="margin-top:18px"></q-btn>
       </q-card>
-    </q-dialog>
+    </div>
   </div>
 </template>
 
@@ -146,6 +167,7 @@ export default {
         return
       }
       this.focusedComponentIndex = null
+      this.showDialog = null
     },
 
     __keydown (e) {
@@ -221,7 +243,6 @@ export default {
 
       return nameByIndex
     },
-
     matrix () {
       const matrix = [],
         n = Object.keys(this.indexByName).length
@@ -311,11 +332,11 @@ export default {
         .attr('height', outerRadius * 2)
         .append('g')
         .attr('transform', 'translate(' + outerRadius + ',' + outerRadius + ')')
-
       const g = svg.selectAll('.group')
         .data(chord.groups)
         .enter().append('g')
         .attr('class', 'group')
+        // .attr('transform', 'rotate(20)')
 
       g.append('path')
         .style('opacity', defaultOpacity)
@@ -334,6 +355,8 @@ export default {
             (d.angle > Math.PI ? 'rotate(180)' : '')
         })
         .style('text-anchor', d => d.angle > Math.PI ? 'end' : null)
+        .style('fill', d => fill(d.index))
+        .style('cursor', 'pointer')
         .text(d => this.nameByIndex.get(d.index))
 
       let colorProcessingPercentages = {}
@@ -348,7 +371,7 @@ export default {
           let index = d.source.index
           let percentage = (colorProcessingPercentages[index] ? colorProcessingPercentages[index] : 70) - 30
           // // let percentage = (colorProcessingPercentages[index] ? colorProcessingPercentages[index] : 0.70) * index
-          console.log(index, percentage)
+          // console.log(index, percentage)
           colorProcessingPercentages[index] = percentage
           let color = fill(index)
           // return
