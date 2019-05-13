@@ -67,7 +67,8 @@ export default {
       filter: '',
       components: [],
       focusedComponentIndex: null,
-      chords: []
+      chords: [],
+      componentCount: 0
     }
   },
 
@@ -146,13 +147,6 @@ export default {
 
   mounted () {
     const svgEl = this.$el.querySelector('svg')
-    let _componentCount = null
-    const componentCount = () => {
-      if (!_componentCount) {
-        _componentCount = Object.keys(this.indexByName).length
-      }
-      return _componentCount
-    }
 
     svgEl.addEventListener('mousemove', e => {
       const d = e.target.__data__
@@ -188,10 +182,10 @@ export default {
       }
 
       if (index !== null) {
-        if (index === componentCount()) {
+        if (index === this.componentCount) {
           index = 0
         } else if (index === -1) {
-          index = componentCount() - 1
+          index = this.componentCount - 1
         }
 
         e.preventDefault()
@@ -285,6 +279,7 @@ export default {
         .attr('d', this.$d3.ribbon().radius(innerRadius))
 
       this.chords = this.$el.querySelectorAll('.chord')
+      this.componentCount = Object.keys(this.indexByName).length
     }
   }
 }
