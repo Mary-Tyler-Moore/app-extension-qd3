@@ -98,5 +98,22 @@ fs.readdirSync(componentsPath).forEach(componentDir => {
 })
 
 process.on('exit', () => {
-  fs.writeFileSync('../src/statics/quasar-api.json', JSON.stringify(quasarApi, '', 2))
+  let components = Object.entries(quasarApi).map(entry => {
+    return {
+      name: entry[0],
+      ...entry[1]
+    }
+  }).filter(comp => {
+    if (comp.related.length) {
+      return true
+    }
+    for (let otherCompName in quasarApi) {
+      const otherComp = quasarApi[otherCompName]
+      if (otherComp.name !== comp.name && otherComp.related.includes(comp.name)) {
+        return true
+      }
+    }
+    return false
+  })
+  fs.writeFileSync('../src/statics/quasar-api.json', JSON.stringify(components, '', 2))
 })
